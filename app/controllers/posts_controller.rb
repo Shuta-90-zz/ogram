@@ -5,6 +5,10 @@ class PostsController < ApplicationController
     @posts = Post.limit(10).includes(:photos, :user).order('created_at desc')
   end
 
+  def show
+    @post = Post.find params[:id]
+  end
+
   def new
     @post = Post.new
     @post.photos.build
@@ -20,6 +24,16 @@ class PostsController < ApplicationController
       redirect_to root_path
       flash[:alert] = '投稿に失敗しました'
     end
+  end
+
+  def destroy
+    @post = Post.find params[:id]
+    if @post.user == current_user
+      flash[:notice] = '投稿が削除されました' if @post.destroy
+    else
+      flash[:alert] = '投稿の削除に失敗しました'
+    end
+    redirect_to root_path
   end
 
   private
